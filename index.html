@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Interaktif - Lahirnya Pancasila (BPUPKI)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+            min-height: 100vh;
+            color: #f8fafc;
+            user-select: none;
+        }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-card-active {
+            background: rgba(67, 56, 202, 0.35);
+            border-color: #6366f1;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Touch & Drag Styling */
+        .draggable-item {
+            cursor: grab;
+            touch-action: none;
+            transition: all 0.2s ease;
+        }
+        .draggable-item:active {
+            cursor: grabbing;
+            transform: scale(1.05);
+        }
+
+        .drop-zone {
+            transition: all 0.2s ease;
+        }
+        .drop-zone.drag-over {
+            background: rgba(99, 102, 241, 0.25);
+            border-color: #818cf8;
+            transform: scale(1.01);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4338ca;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6366f1;
+        }
+
+        .glow-button {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glow-button:hover {
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
+            transform: translateY(-2px);
+        }
+        .glow-button:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="p-3 md:p-6 text-slate-100 flex flex-col justify-between min-h-screen">
+
+    <div>
+        <!-- App Header & Navigation Bar -->
+        <header class="glass-card rounded-2xl p-4 mb-6 shadow-2xl flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-xl bg-indigo-600 flex items-center justify-center text-white text-2xl shadow-lg shadow-indigo-500/30">
+                    <i class="fa-solid fa-monument"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="bg-indigo-500/20 text-indigo-300 text-xs font-bold px-2.5 py-0.5 rounded-full border border-indigo-500/30">
+                            STATION 1: PAPAN DIGITAL INTERAKTIF
+                        </span>
+                        <span class="bg-emerald-500/20 text-emerald-300 text-xs font-bold px-2.5 py-0.5 rounded-full border border-emerald-500/30">
+                            PPKn KELAS 8
+                        </span>
+                    </div>
+                    <h1 class="text-xl md:text-2xl font-extrabold tracking-tight text-white mt-0.5">
+                        Eksplorasi Lahirnya Pancasila (Sidang BPUPKI I)
+                    </h1>
+                </div>
+            </div>
+
+            <!-- Global Station Timer Widget -->
+            <div class="flex items-center bg-slate-900/80 px-4 py-2.5 rounded-xl border border-slate-700/60 gap-4">
+                <div class="text-right">
+                    <div class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Timer Station Rotation</div>
+                    <div id="timerDisplay" class="text-2xl font-mono font-bold text-amber-400">15:00</div>
+                </div>
+                <div class="flex gap-1.5">
+                    <button onclick="toggleTimer()" id="timerToggleBtn" class="bg-emerald-600 hover:bg-emerald-500 text-white w-9 h-9 rounded-lg flex items-center justify-center transition shadow-md">
+                        <i class="fa-solid fa-play"></i>
+                    </button>
+                    <button onclick="resetTimer()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 w-9 h-9 rounded-lg flex items-center justify-center transition">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="flex flex-wrap gap-2 mb-6">
+            <button onclick="switchTab('timeline')" id="tab-timeline" class="nav-tab active-tab flex-1 min-w-[150px] py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition glass-card glass-card-active text-indigo-300">
+                <i class="fa-solid fa-timeline"></i> 1. Lini Masa & Tokoh
+            </button>
+            <button onclick="switchTab('matching')" id="tab-matching" class="nav-tab flex-1 min-w-[150px] py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition glass-card text-slate-400 hover:text-slate-200">
+                <i class="fa-solid fa-puzzle-piece"></i> 2. Matriks Kata Kunci
+            </button>
+            <button onclick="switchTab('simulator')" id="tab-simulator" class="nav-tab flex-1 min-w-[150px] py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition glass-card text-slate-400 hover:text-slate-200">
+                <i class="fa-solid fa-sliders"></i> 3. Simulator Ekasila
+            </button>
+            <button onclick="switchTab('comparative')" id="tab-comparative" class="nav-tab flex-1 min-w-[150px] py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition glass-card text-slate-400 hover:text-slate-200">
+                <i class="fa-solid fa-code-compare"></i> 4. Komparasi Pemikiran
+            </button>
+            <button onclick="switchTab('rotation')" id="tab-rotation" class="nav-tab flex-1 min-w-[150px] py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition glass-card text-slate-400 hover:text-slate-200">
+                <i class="fa-solid fa-arrows-rotate"></i> 5. Peta Station
+            </button>
+        </nav>
+
+        <main id="content-area">
+            
+            <!-- SECTION 1: LINI MASA & TOKOH -->
+            <section id="section-timeline" class="tab-content space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Founder Card 1: Yamin -->
+                    <div class="glass-card rounded-2xl p-5 border-l-4 border-l-amber-500 hover:border-l-amber-400 transition flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <span class="text-xs font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-md border border-amber-500/20">
+                                        29 Mei 1945
+                                    </span>
+                                    <h3 class="text-xl font-bold text-white mt-2">Mr. Muhammad Yamin</h3>
+                                    <p class="text-xs text-slate-400">Sastrawan, Ahli Hukum & Politikus</p>
+                                </div>
+                                <div class="w-12 h-12 rounded-full bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-300 text-xl font-bold">
+                                    MY
+                                </div>
+                            </div>
+                            
+                            <p class="text-sm text-slate-300 mb-4 line-clamp-3">
+                                Menjadi pembicara pertama yang mengemukakan 5 asas dasar negara secara lisan dan tertulis dalam Sidang BPUPKI.
+                            </p>
+
+                            <div class="space-y-2 mb-4">
+                                <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Usulan Asas Dasar Negara:</div>
+                                <ol class="space-y-1.5 text-xs text-slate-200 font-medium">
+                                    <li class="bg-slate-800/80 p-2 rounded-lg border border-slate-700/50 flex items-center gap-2">
+                                        <span class="w-5 h-5 rounded-full bg-amber-500/30 text-amber-300 flex items-center justify-center text-[10px] font-bold">1</span> Peri Kebangsaan
+                                    </li>
+                                    <li class="bg-slate-800/80 p-2 rounded-lg border border-slate-700/50 flex items-center gap-2">
+                                        <span class="w-5 h-5 rounded-full bg-amber-500/30 text-amber-300 flex items-center justify-center text-[10px] font-bold">2</span> Peri Kemanusiaan
+                                    </li>
+                                    <li class="bg-slate-800/80 p-2 rounded-lg border border-slate-700/50 flex items-center gap-2">
+                                        <span class="w-5 h-5 rounded-full bg-amber-500/30 text-amber-300 flex items-center justify-center text-[10px] font-bold">3</span> Peri Ketuhanan
+                                    </li>
+                                    <li class="bg-slate-800/80 p-2 rounded-lg border border-slate-700/50 flex items-center gap-2">
+                                        <span class="w-5 h-5 rounded-full bg-amber-500/30 text-amber-300 flex items-center justify-center text-[10px] font-bold">4</span> Peri Kerakyatan
+                                    </li>
+                                    <li class="bg-slate-800/80 p-2 rounded-lg border border-slate-700/50 flex items-center gap-2">
+                                        <span class="w-5 h-5 rounded-full bg-amber-500/30 text-amber-300 flex items-center justify-center text-[10px] font-bold">5</span> Kesejahteraan Rakyat
+                                    </li>
+                                </ol>
+                            </div>
+                        </div>
+
+                        <button onclick="openModal('yamin')" class="w-full py-2.5 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-bold rounded-xl transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-book-open"></i> Pelajari Pemikiran Yamin
+                        </button>
+                    </div>
+
+                    <!-- Founder Card 2: Soepomo -->
+                    <div class="glass-card rounded-2xl p-5 border-l-4 border-l-blue-500 hover:border-l-blue-400 transition flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <span class="text-xs font-bold uppercase tracking-wider text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded-md border border-blue-500/20">
+                                        31 Mei 1945
+                                    </span>
+                                    <h3 class="text-xl font-bold text-white mt-2">Prof. Dr. Soepomo</h3>
+                                    <p class="text-xs text-slate-400">Ahli Hukum Adat & Arsitek UUD 1945</p>
+                                </div>
+                                <div class="w-12 h-12 rounded-full bg-blue-500/20 border border-blue-500/40 flex items-center justify-center text-blue-300 text-xl font-bold">
+                                    SP
+                                </div>
+                            </div>
+                            
+                            <p class="text-sm text-slate-300 mb-4 line-clamp-3">
+                                Mengajukan konsep <strong>Paham Negara Integralistik (Kekeluargaan)</strong>, di mana negara menyatu dengan seluruh rakyat.
+                            </p>
+
+                            <div class="space-y-2 mb-4">
+                                <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Usulan Dasarnya:</div>
+                                <ol class="space-y-1.5 text-xs text-slate-200 font-medium">
+                                    <li class="bg-slate-800/80 p-2 rounded-lg border border-slate-700/50 flex items-center gap-2">
+                                        <span class="w-5 h-5 rounded-full bg-blue-500/30 text-blue-300 flex items-center justify-center text-[10px] font-bold">1</span> Persatuan
+                                    </li>
+                                    <li class="bg-slate-800/80 p-2 rounded-lg border border-slate-700/50 flex items-center gap-2">
+                                        <span class="w-5 h-5 rounded-full bg-blue-500/30 text-blue-300 flex items-center justify-center text-[10px] font-bold">2</span> Kekeluargaan
+                                    </li>
+                                    <li class="bg-slate-800/80 p-2 rounded-lg border border-slate-700/50 flex items-center gap-2">
+                                        <span class="w-5 h-5 rounded-full bg-blue-500/30 text-blue-300 flex items-center justify-center text-[10px] font-bold">3</span> Keseimbangan Lahir dan Batin
+                                    </li>
+                                    <li class="bg-slate-800/80 p-2 rounded-lg border border-slate-700/50 flex items-center gap-2">
+                                        <span class="w-5 h-5 rounded-full bg-blue-500/30 text-blue-300 flex items-center justify-center text-[10px] font-bold">4</span> Musyawarah
+                                    </li>
+                                    <li class="bg-slate-800/80 p-2 rounded-lg border border-slate-700/50 flex items-center gap-2">
+                                        <span class="w-5 h-5 rounded-full bg-blue-500/30 text-blue-300 flex items-center justify-center text-[10px] font-bold">5</span> Keadilan Rakyat
+                                    </li>
+                                </ol>
+                            </div>
+                        </div>
+
+                        <button onclick="openModal('soepomo')" class="w-full py-2.5 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/40 text-blue-300 text-xs font-bold rounded-xl transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-book-open"></i> Pelajari Paham Integralistik
+                        </button>
+                    </div>
+
+                    <!-- Founder Card 3: Soekarno -->
+                    <div class="glass-card rounded-2xl p-5 border-l-4 border-l-rose-500 hover:border-l-rose-400 transition flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <span class="text-xs font-bold uppercase tracking-wider text-rose-400 bg-rose-500/10 px-2.5 py-1 rounded-md border border-rose-500/20">
+                                        1 Juni 1945
+                                    </span>
+                                    <h3 class="text-xl font-bold text-white mt-2">Ir. Soekarno</h3>
+                                    <p class="text-xs text-slate-400">Proklamator & Proposesor Nama "Pancasila"</p>
+                                </div>
+                                <div class="w-12 h-12 rounded-full bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-300 text-xl font-bold">
+                                    SK
+                                </div>
+                            </div>
+                            
+                            <p class="text-sm text-slate-300 mb-4 line-clamp-3">
+                                Menyampaikan pidato mendalam tanpa teks dan secara resmi memperkenalkan nama <strong>"Pancasila"</strong> atas petunjuk ahli bahasa.
+                            </p>
+
+                            <div class="space-y-2 mb-4">
+                                <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Usulan 5 Sila:</div>
+                                <ol class="space-y-1.5 text-xs text-slate-200 font-medium">
+                                    <li class="bg-slate-800/80 p-2 rounded-lg border border-slate-700/50 flex items-center gap-2">
+                                        <span class="w-5 h-5 rounded-full bg-rose-500/30 text-rose-300 flex items-center justify-center text-[10px] font-bold">1</span> Kebangsaan Indonesia
+                                    </li>
+                                    <li class="bg-slate-800/80 p-2 rounded-lg border border-slate-700/50 flex items-center gap-2">
+                                        <span class="w-5 h-5 rounded-full bg-rose-500/30 text-rose-300 flex items-center justify-center text-[10px] font-bold">2</span> Internasionalisme / Perikemanusiaan
+                                    </li>
+                                    <li class="bg-slate-800/80 p-2 rounded-lg border border-slate-700/50 flex items-center gap-2">
+                                        <span class="w-5 h-5 rounded-full bg-rose-500/30 text-rose-300 flex items-center justify-center text-[10px] font-bold">3</span> Mufakat / Demokrasi
+                                    </li>
+                                    <li class="bg-slate-800/80 p-2 rounded-lg border border-slate-700/50 flex items-center gap-2">
+                                        <span class="w-5 h-5 rounded-full bg-rose-500/30 text-rose-300 flex items-center justify-center text-[10px] font-bold">4</span> Kesejahteraan Sosial
+                                    </li>
+                                    <li class="bg-slate-800/80 p-2 rounded-lg border border-slate-700/50 flex items-center gap-2">
+                                        <span class="w-5 h-5 rounded-full bg-rose-500/30 text-rose-300 flex items-center justify-center text-[10px] font-bold">5</span> Ketuhanan yang Berkebudayaan
+                                    </li>
+                                </ol>
+                            </div>
+                        </div>
+
+                        <button onclick="openModal('soekarno')" class="w-full py-2.5 bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 text-xs font-bold rounded-xl transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-book-open"></i> Pelajari Pidato Soekarno
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 2: MATRIKS KATA KUNCI (INTERACTIVE GAME) -->
+            <section id="section-matching" class="tab-content hidden space-y-6">
+                <div class="glass-card rounded-2xl p-6 border border-slate-700">
+                    <div class="flex flex-wrap justify-between items-center gap-4 mb-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-puzzle-piece text-indigo-400"></i> Tantangan Papan Digital: Klasifikasi Kata Kunci
+                            </h2>
+                            <p class="text-xs text-slate-300 mt-1">
+                                Tarik (drag) atau sentuh kata kunci di bawah ini, lalu tempatkan ke dalam kolom tokoh perumus yang sesuai!
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="bg-indigo-950/80 border border-indigo-500/30 px-3 py-1.5 rounded-xl text-xs font-bold text-indigo-300">
+                                Skor: <span id="gameScore" class="text-amber-400 text-base">0</span> / 9
+                            </div>
+                            <button onclick="resetMatchingGame()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-xl text-xs font-bold transition">
+                                <i class="fa-solid fa-rotate"></i> Reset Game
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Draggable Cards Pool -->
+                    <div id="keywordsPool" class="min-h-[90px] p-4 bg-slate-900/90 rounded-xl border border-dashed border-indigo-500/40 flex flex-wrap gap-2.5 items-center mb-6">
+                        <!-- Populated via JS -->
+                    </div>
+
+                    <!-- Drop Target Columns -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- Column Yamin -->
+                        <div class="drop-zone glass-card rounded-xl p-4 border border-amber-500/30 min-h-[220px]" data-tokoh="yamin">
+                            <div class="text-sm font-bold text-amber-300 border-b border-amber-500/30 pb-2 mb-3 flex items-center justify-between">
+                                <span>Mr. Muhammad Yamin</span>
+                                <span class="text-[10px] bg-amber-500/20 px-2 py-0.5 rounded">29 Mei</span>
+                            </div>
+                            <div class="drop-container space-y-2 min-h-[150px]" id="drop-yamin"></div>
+                        </div>
+
+                        <!-- Column Soepomo -->
+                        <div class="drop-zone glass-card rounded-xl p-4 border border-blue-500/30 min-h-[220px]" data-tokoh="soepomo">
+                            <div class="text-sm font-bold text-blue-300 border-b border-blue-500/30 pb-2 mb-3 flex items-center justify-between">
+                                <span>Prof. Dr. Soepomo</span>
+                                <span class="text-[10px] bg-blue-500/20 px-2 py-0.5 rounded">31 Mei</span>
+                            </div>
+                            <div class="drop-container space-y-2 min-h-[150px]" id="drop-soepomo"></div>
+                        </div>
+
+                        <!-- Column Soekarno -->
+                        <div class="drop-zone glass-card rounded-xl p-4 border border-rose-500/30 min-h-[220px]" data-tokoh="soekarno">
+                            <div class="text-sm font-bold text-rose-300 border-b border-rose-500/30 pb-2 mb-3 flex items-center justify-between">
+                                <span>Ir. Soekarno</span>
+                                <span class="text-[10px] bg-rose-500/20 px-2 py-0.5 rounded">1 Juni</span>
+                            </div>
+                            <div class="drop-container space-y-2 min-h-[150px]" id="drop-soekarno"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 3: SIMULATOR TRISILA & EKASILA -->
+            <section id="section-simulator" class="tab-content hidden space-y-6">
+                <div class="glass-card rounded-2xl p-6 border border-rose-500/30">
+                    <div class="max-w-3xl mx-auto text-center space-y-3 mb-6">
+                        <span class="bg-rose-500/20 text-rose-300 text-xs font-bold px-3 py-1 rounded-full border border-rose-500/30 uppercase tracking-wide">
+                            Gagasan Khusus Ir. Soekarno (1 Juni 1945)
+                        </span>
+                        <h2 class="text-2xl font-extrabold text-white">
+                            Simulator "Pemerasan" Pancasila
+                        </h2>
+                        <p class="text-xs text-slate-300">
+                            Soekarno menjelaskan bahwa jika 5 Sila tidak disetujui, sila tersebut dapat diringkas menjadi <strong>Trisila</strong>, dan jika diringkas lagi menjadi <strong>Ekasila</strong>. Geser slider di bawah untuk menyimulasikan!
+                        </p>
+                    </div>
+
+                    <!-- Slider Control -->
+                    <div class="max-w-md mx-auto mb-8 bg-slate-900/80 p-4 rounded-xl border border-slate-700">
+                        <label for="silaSlider" class="block text-xs font-bold text-slate-400 uppercase mb-2 text-center">
+                            Tingkat Ringkasan Sila: <span id="sliderLabel" class="text-rose-400 font-extrabold text-sm">5 Sila (Pancasila)</span>
+                        </label>
+                        <input type="range" id="silaSlider" min="1" max="3" value="1" step="1" oninput="updateSilaSimulation(this.value)" class="w-full h-3 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-rose-500">
+                        <div class="flex justify-between text-[10px] text-slate-400 font-bold mt-2 px-1">
+                            <span>PANCASILA (5)</span>
+                            <span>TRISILA (3)</span>
+                            <span>EKASILA (1)</span>
+                        </div>
+                    </div>
+
+                    <!-- Visual Container for Sila Cards -->
+                    <div id="silaVisualContainer" class="grid grid-cols-1 md:grid-cols-5 gap-3 transition-all duration-300">
+                        <!-- Populated by JavaScript -->
+                    </div>
+
+                    <!-- Explanation Box -->
+                    <div id="silaExplanation" class="mt-6 p-4 bg-indigo-950/60 border border-indigo-500/30 rounded-xl text-xs text-indigo-200 leading-relaxed text-center max-w-2xl mx-auto">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 4: KOMPARASI PEMIKIRAN TOKOH -->
+            <section id="section-comparative" class="tab-content hidden space-y-6">
+                <div class="glass-card rounded-2xl p-6 border border-slate-700">
+                    <h2 class="text-xl font-bold text-white mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-code-compare text-indigo-400"></i> Analisis Komparasi Pendekatan Perumus
+                    </h2>
+                    <p class="text-xs text-slate-300 mb-6">
+                        Bandingkan fokus filosofis utama antara Soepomo (Paham Negara Integralistik) dan Soekarno (Internasionalisme & Kebangsaan).
+                    </p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Comparison Box 1 -->
+                        <div class="bg-slate-900/80 rounded-xl p-5 border border-blue-500/30 space-y-3">
+                            <div class="flex items-center gap-3 border-b border-blue-500/20 pb-3">
+                                <div class="w-10 h-10 rounded-lg bg-blue-500/20 text-blue-300 flex items-center justify-center font-bold">SP</div>
+                                <div>
+                                    <h3 class="text-base font-bold text-white">Pendekatan Integralistik (Soepomo)</h3>
+                                    <span class="text-[10px] text-blue-400 font-semibold uppercase">Fokus: Ke dalam & Keharmonisan Internal</span>
+                                </div>
+                            </div>
+                            <ul class="space-y-2 text-xs text-slate-300">
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-check text-blue-400 mt-0.5"></i>
+                                    <span><strong>Negara Organik:</strong> Negara dan masyarakat adalah satu kesatuan utuh yang tidak dipisahkan.</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-check text-blue-400 mt-0.5"></i>
+                                    <span><strong>Menolak Individualisme:</strong> Kepentingan bersama / kekeluargaan di atas hak-hak individu.</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-check text-blue-400 mt-0.5"></i>
+                                    <span><strong>Musyawarah Manunggal:</strong> Pemimpin adalah pelindung rakyat yang menyatu secara batiniah.</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Comparison Box 2 -->
+                        <div class="bg-slate-900/80 rounded-xl p-5 border border-rose-500/30 space-y-3">
+                            <div class="flex items-center gap-3 border-b border-rose-500/20 pb-3">
+                                <div class="w-10 h-10 rounded-lg bg-rose-500/20 text-rose-300 flex items-center justify-center font-bold">SK</div>
+                                <div>
+                                    <h3 class="text-base font-bold text-white">Pendekatan Kebangsaan & Perikemanusiaan (Soekarno)</h3>
+                                    <span class="text-[10px] text-rose-400 font-semibold uppercase">Fokus: Kebangsaan yang Terbuka ke Dunia</span>
+                                </div>
+                            </div>
+                            <ul class="space-y-2 text-slate-300 text-xs">
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-check text-rose-400 mt-0.5"></i>
+                                    <span><strong>Nasionale Staat:</strong> Seluruh rakyat Indonesia dari Sabang sampai Merauke dalam satu jiwa kebangsaan.</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-check text-rose-400 mt-0.5"></i>
+                                    <span><strong>Anti-Chauvinisme:</strong> Kebangsaan tidak berdiri sendiri, tapi bergandengan dengan Internasionalisme (*Perikemanusiaan*).</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-check text-rose-400 mt-0.5"></i>
+                                    <span><strong>Gotong Royong Dinamis:</strong> Demokrasi sosial yang bekerja keras untuk kesejahteraan bersama.</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Critical Inquiry Card -->
+                    <div class="mt-6 bg-gradient-to-r from-indigo-950 to-slate-900 p-4 rounded-xl border border-indigo-500/40 flex items-start gap-3">
+                        <i class="fa-solid fa-lightbulb text-amber-400 text-xl mt-1"></i>
+                        <div>
+                            <h4 class="text-sm font-bold text-white">Pertanyaan Kritis Diskusi Kelompok:</h4>
+                            <p class="text-xs text-indigo-200 mt-1">
+                                Mengapa Soekarno menegaskan: <em>"Kita tidak hanya mendirikan negara untuk satu golongan, tetapi 'semua buat semua'?"</em> Bagaimana gagasan ini mencegah konflik antar kelompok di Indonesia?
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 5: PETA STATION ROTATION -->
+            <section id="section-rotation" class="tab-content hidden space-y-6">
+                <div class="glass-card rounded-2xl p-6 border border-slate-700">
+                    <h2 class="text-xl font-bold text-white mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-arrows-rotate text-indigo-400"></i> Panduan Alur Station Rotation Kelas 8
+                    </h2>
+                    <p class="text-xs text-slate-300 mb-6">
+                        Setiap kelompok akan berputar (*rotate*) setiap 15 menit sesuai dengan petunjuk guru.
+                    </p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                        <!-- Station 1 Card -->
+                        <div class="bg-indigo-950/70 rounded-xl p-4 border border-indigo-500/40 space-y-2">
+                            <span class="bg-indigo-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-md">STATION 1 (PAPAN DIGITAL)</span>
+                            <h3 class="text-sm font-bold text-white mt-1">Investigasi Gagasan Tokoh</h3>
+                            <p class="text-xs text-indigo-200">
+                                Menggunakan media interaktif ini untuk menganalisis pemikiran Yamin, Soepomo, Soekarno, dan menyelesaikan Matriks Kata Kunci.
+                            </p>
+                        </div>
+
+                        <!-- Station 2 Card -->
+                        <div class="bg-slate-900/80 rounded-xl p-4 border border-slate-700 space-y-2">
+                            <span class="bg-slate-700 text-slate-200 text-[10px] font-bold px-2.5 py-1 rounded-md">STATION 2 (DISKUSI)</span>
+                            <h3 class="text-sm font-bold text-white mt-1">Studi Kasus Piagam Jakarta</h3>
+                            <p class="text-xs text-slate-300">
+                                Membaca teks sumber primer musyawarah 18 Agustus 1945 dan menganalisis dampak kompromi sila pertama demi persatuan.
+                            </p>
+                        </div>
+
+                        <!-- Station 3 Card -->
+                        <div class="bg-emerald-950/70 rounded-xl p-4 border border-emerald-500/40 space-y-2">
+                            <span class="bg-emerald-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-md">STATION 3 (REFLEKSI)</span>
+                            <h3 class="text-sm font-bold text-white mt-1">Pancasila & Isu Sosial</h3>
+                            <p class="text-xs text-emerald-200">
+                                Memilih 1 kasus masa kini (Perundungan, Intoleransi, Ketimpangan) dan merumuskan aksi nyata pelajar secara mandiri.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Detail Modal -->
+    <div id="detailModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-card rounded-2xl max-w-2xl w-full p-6 border border-slate-700 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div id="modalContent">
+                <!-- Injected dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* WEB AUDIO API FOR SOUND EFFECTS */
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playTone(freq, type = 'sine', duration = 0.15) {
+            try {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch(e) {}
+        }
+
+        function playSuccessSound() {
+            playTone(523.25, 'triangle', 0.1); // C5
+            setTimeout(() => playTone(659.25, 'triangle', 0.15), 100); // E5
+            setTimeout(() => playTone(783.99, 'triangle', 0.25), 200); // G5
+        }
+
+        function playErrorSound() {
+            playTone(220, 'sawtooth', 0.15);
+            setTimeout(() => playTone(180, 'sawtooth', 0.25), 150);
+        }
+
+        /* TIMER LOGIC */
+        let timerSeconds = 15 * 60;
+        let timerInterval = null;
+        let isTimerRunning = false;
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(timerSeconds / 60);
+            const secs = timerSeconds % 60;
+            document.getElementById('timerDisplay').innerText = 
+                `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        function toggleTimer() {
+            const btn = document.getElementById('timerToggleBtn');
+            if (isTimerRunning) {
+                clearInterval(timerInterval);
+                isTimerRunning = false;
+                btn.innerHTML = '<i class="fa-solid fa-play"></i>';
+                btn.className = 'bg-emerald-600 hover:bg-emerald-500 text-white w-9 h-9 rounded-lg flex items-center justify-center transition shadow-md';
+            } else {
+                isTimerRunning = true;
+                btn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+                btn.className = 'bg-amber-600 hover:bg-amber-500 text-white w-9 h-9 rounded-lg flex items-center justify-center transition shadow-md';
+                timerInterval = setInterval(() => {
+                    if (timerSeconds > 0) {
+                        timerSeconds--;
+                        updateTimerDisplay();
+                    } else {
+                        clearInterval(timerInterval);
+                        isTimerRunning = false;
+                        playSuccessSound();
+                        alert('Waktu Station Rotation Selesai! Saatnya Berpindah Stasiun!');
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            timerSeconds = 15 * 60;
+            updateTimerDisplay();
+            const btn = document.getElementById('timerToggleBtn');
+            btn.innerHTML = '<i class="fa-solid fa-play"></i>';
+            btn.className = 'bg-emerald-600 hover:bg-emerald-500 text-white w-9 h-9 rounded-lg flex items-center justify-center transition shadow-md';
+        }
+
+        /* NAVIGATION TAB SWITCHER */
+        function switchTab(tabId) {
+            playTone(400, 'sine', 0.05);
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-tab').forEach(el => {
+                el.classList.remove('glass-card-active', 'text-indigo-300');
+                el.classList.add('text-slate-400');
+            });
+
+            document.getElementById(`section-${tabId}`).classList.remove('hidden');
+            const activeTab = document.getElementById(`tab-${tabId}`);
+            activeTab.classList.add('glass-card-active', 'text-indigo-300');
+            activeTab.classList.remove('text-slate-400');
+        }
+
+        /* MATCHING GAME DATA & LOGIC */
+        const keywordItems = [
+            { id: 'k1', text: 'Peri Kebangsaan', tokoh: 'yamin', bg: 'bg-amber-500/20 border-amber-500/40 text-amber-200' },
+            { id: 'k2', text: 'Peri Kemanusiaan', tokoh: 'yamin', bg: 'bg-amber-500/20 border-amber-500/40 text-amber-200' },
+            { id: 'k3', text: 'Kesejahteraan Rakyat', tokoh: 'yamin', bg: 'bg-amber-500/20 border-amber-500/40 text-amber-200' },
+            { id: 'k4', text: 'Paham Integralistik', tokoh: 'soepomo', bg: 'bg-blue-500/20 border-blue-500/40 text-blue-200' },
+            { id: 'k5', text: 'Kekeluargaan & Persatuan', tokoh: 'soepomo', bg: 'bg-blue-500/20 border-blue-500/40 text-blue-200' },
+            { id: 'k6', text: 'Keseimbangan Lahir-Batin', tokoh: 'soepomo', bg: 'bg-blue-500/20 border-blue-500/40 text-blue-200' },
+            { id: 'k7', text: 'Internasionalisme', tokoh: 'soekarno', bg: 'bg-rose-500/20 border-rose-500/40 text-rose-200' },
+            { id: 'k8', text: 'Gotong Royong (Ekasila)', tokoh: 'soekarno', bg: 'bg-rose-500/20 border-rose-500/40 text-rose-200' },
+            { id: 'k9', text: 'Trisila (Sosio-Nasionalisme)', tokoh: 'soekarno', bg: 'bg-rose-500/20 border-rose-500/40 text-rose-200' }
+        ];
+
+        let gameScore = 0;
+        let selectedKeyword = null;
+
+        function initMatchingGame() {
+            const pool = document.getElementById('keywordsPool');
+            pool.innerHTML = '';
+            document.getElementById('drop-yamin').innerHTML = '';
+            document.getElementById('drop-soepomo').innerHTML = '';
+            document.getElementById('drop-soekarno').innerHTML = '';
+            gameScore = 0;
+            document.getElementById('gameScore').innerText = '0';
+
+            // Shuffle items
+            const shuffled = [...keywordItems].sort(() => Math.random() - 0.5);
+
+            shuffled.forEach(item => {
+                const badge = document.createElement('div');
+                badge.className = `draggable-item px-3 py-2 rounded-xl text-xs font-bold border ${item.bg} flex items-center gap-2 shadow-md cursor-pointer select-none`;
+                badge.setAttribute('draggable', 'true');
+                badge.setAttribute('id', item.id);
+                badge.innerText = item.text;
+
+                // Drag Events
+                badge.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', item.id);
+                });
+
+                // Touch/Click Event fallback for Smart Boards
+                badge.addEventListener('click', () => {
+                    playTone(500, 'sine', 0.05);
+                    if (selectedKeyword === badge) {
+                        badge.classList.remove('ring-2', 'ring-white');
+                        selectedKeyword = null;
+                    } else {
+                        if (selectedKeyword) selectedKeyword.classList.remove('ring-2', 'ring-white');
+                        selectedKeyword = badge;
+                        badge.classList.add('ring-2', 'ring-white');
+                    }
+                });
+
+                pool.appendChild(badge);
+            });
+
+            // Setup Drop Zones
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                zone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    zone.classList.add('drag-over');
+                });
+
+                zone.addEventListener('dragleave', () => {
+                    zone.classList.remove('drag-over');
+                });
+
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('drag-over');
+                    const itemId = e.dataTransfer.getData('text/plain');
+                    const itemEl = document.getElementById(itemId);
+                    if (itemEl) handleMatch(itemEl, zone.getAttribute('data-tokoh'));
+                });
+
+                // Click on zone to match selected item
+                zone.addEventListener('click', () => {
+                    if (selectedKeyword) {
+                        handleMatch(selectedKeyword, zone.getAttribute('data-tokoh'));
+                        selectedKeyword.classList.remove('ring-2', 'ring-white');
+                        selectedKeyword = null;
+                    }
+                });
+            });
+        }
+
+        function handleMatch(itemEl, targetTokoh) {
+            const itemData = keywordItems.find(k => k.id === itemEl.id);
+            if (itemData.tokoh === targetTokoh) {
+                playSuccessSound();
+                document.getElementById(`drop-${targetTokoh}`).appendChild(itemEl);
+                itemEl.setAttribute('draggable', 'false');
+                itemEl.classList.remove('draggable-item');
+                itemEl.classList.add('opacity-90');
+                gameScore++;
+                document.getElementById('gameScore').innerText = gameScore;
+
+                if (gameScore === keywordItems.length) {
+                    setTimeout(() => {
+                        alert('🎉 Luar Biasa! Semua kata kunci berhasil diklasifikasikan dengan benar!');
+                    }, 300);
+                }
+            } else {
+                playErrorSound();
+                itemEl.classList.add('animate-bounce');
+                setTimeout(() => itemEl.classList.remove('animate-bounce'), 500);
+            }
+        }
+
+        function resetMatchingGame() {
+            initMatchingGame();
+        }
+
+        /* SIMULATOR TRISILA & EKASILA */
+        function updateSilaSimulation(val) {
+            playTone(300 + val * 100, 'sine', 0.08);
+            const container = document.getElementById('silaVisualContainer');
+            const label = document.getElementById('sliderLabel');
+            const exp = document.getElementById('silaExplanation');
+
+            if (val == 1) {
+                label.innerText = '5 Sila (Pancasila)';
+                container.className = 'grid grid-cols-1 md:grid-cols-5 gap-3 transition-all duration-300';
+                container.innerHTML = `
+                    <div class="bg-rose-900/40 border border-rose-500/40 p-3 rounded-xl text-center"><div class="text-xs font-bold text-rose-300">Sila 1</div><div class="text-[11px] font-semibold text-white mt-1">Kebangsaan Indonesia</div></div>
+                    <div class="bg-rose-900/40 border border-rose-500/40 p-3 rounded-xl text-center"><div class="text-xs font-bold text-rose-300">Sila 2</div><div class="text-[11px] font-semibold text-white mt-1">Internasionalisme</div></div>
+                    <div class="bg-rose-900/40 border border-rose-500/40 p-3 rounded-xl text-center"><div class="text-xs font-bold text-rose-300">Sila 3</div><div class="text-[11px] font-semibold text-white mt-1">Mufakat / Demokrasi</div></div>
+                    <div class="bg-rose-900/40 border border-rose-500/40 p-3 rounded-xl text-center"><div class="text-xs font-bold text-rose-300">Sila 4</div><div class="text-[11px] font-semibold text-white mt-1">Kesejahteraan Sosial</div></div>
+                    <div class="bg-rose-900/40 border border-rose-500/40 p-3 rounded-xl text-center"><div class="text-xs font-bold text-rose-300">Sila 5</div><div class="text-[11px] font-semibold text-white mt-1">Ketuhanan Berkebudayaan</div></div>
+                `;
+                exp.innerHTML = `<strong>PANCASILA:</strong> Lima prinsip utama yang diajukan Ir. Soekarno pada 1 Juni 1945 sebagai dasar filosofis (*Philosofische Grondslag*) negara Indonesia merdeka.`;
+            } else if (val == 2) {
+                label.innerText = '3 Sila (Trisila)';
+                container.className = 'grid grid-cols-1 md:grid-cols-3 gap-4 transition-all duration-300 max-w-2xl mx-auto';
+                container.innerHTML = `
+                    <div class="bg-amber-900/40 border border-amber-500/40 p-4 rounded-xl text-center"><div class="text-xs font-bold text-amber-300">Sila 1</div><div class="text-xs font-bold text-white mt-1">Sosio-Nasionalisme</div><div class="text-[10px] text-slate-300 mt-1">(Gabungan Kebangsaan & Perikemanusiaan)</div></div>
+                    <div class="bg-amber-900/40 border border-amber-500/40 p-4 rounded-xl text-center"><div class="text-xs font-bold text-amber-300">Sila 2</div><div class="text-xs font-bold text-white mt-1">Sosio-Demokrasi</div><div class="text-[10px] text-slate-300 mt-1">(Gabungan Demokrasi & Kesejahteraan)</div></div>
+                    <div class="bg-amber-900/40 border border-amber-500/40 p-4 rounded-xl text-center"><div class="text-xs font-bold text-amber-300">Sila 3</div><div class="text-xs font-bold text-white mt-1">Ketuhanan</div><div class="text-[10px] text-slate-300 mt-1">(Ketuhanan yang Menghormati Agama Lain)</div></div>
+                `;
+                exp.innerHTML = `<strong>TRISILA:</strong> Soekarno meremas 5 Sila menjadi 3 inti: <em>Sosio-nasionalisme</em> (nasionalisme yang berprikemanusiaan), <em>Sosio-demokrasi</em> (demokrasi yang menyejahterakan), dan <em>Ketuhanan</em>.`;
+            } else if (val == 3) {
+                label.innerText = '1 Sila (Ekasila)';
+                container.className = 'grid grid-cols-1 gap-4 transition-all duration-300 max-w-md mx-auto';
+                container.innerHTML = `
+                    <div class="bg-emerald-900/50 border-2 border-emerald-500 p-6 rounded-2xl text-center shadow-xl shadow-emerald-500/20">
+                        <div class="text-xs font-bold text-emerald-300 uppercase tracking-widest">INTI DARI SEGALANYA (EKASILA)</div>
+                        <div class="text-2xl font-extrabold text-white mt-2">GOTONG ROYONG</div>
+                        <p class="text-xs text-emerald-200 mt-2">"Pembantuan-mutual, satu buat semua, semua buat satu!"</p>
+                    </div>
+                `;
+                exp.innerHTML = `<strong>EKASILA (GOTONG ROYONG):</strong> Jika Trisila diperas lagi menjadi satu, itulah <strong>Gotong Royong</strong>. Menurut Soekarno, jiwa asli dan semangat terdalam bangsa Indonesia adalah gotong royong dan membanting tulang bersama.`;
+            }
+        }
+
+        /* MODALS LOGIC */
+        const modalData = {
+            yamin: {
+                title: "Pemikiran Mr. Muhammad Yamin",
+                date: "29 Mei 1945",
+                content: `
+                    <p class="text-xs text-slate-300 leading-relaxed mb-3">
+                        Mr. Muhammad Yamin menyampaikan pidatonya pada hari pertama Sidang BPUPKI I. Beliau menekankan bahwa Indonesia yang merdeka harus didasarkan pada peradaban dan sejarah luhur bangsa sendiri.
+                    </p>
+                    <div class="bg-slate-900 p-3 rounded-xl border border-slate-700 text-xs text-amber-200 italic mb-3">
+                        "Rakyat Indonesia dapat hak membentuk negara... yang berasal dari peradaban nasional Indonesia sendiri."
+                    </div>
+                    <h4 class="text-xs font-bold text-white uppercase mb-1">Dua Bentuk Usulan:</h4>
+                    <p class="text-xs text-slate-300">
+                        Yamin menyampaikan usulan secara <strong>lisan</strong> (Peri Kebangsaan, Kemanusiaan, Ketuhanan, Kerakyatan, Kesejahteraan) dan merumuskan usulan <strong>tertulis</strong> dalam rancangan UUD.
+                    </p>
+                `
+            },
+            soepomo: {
+                title: "Paham Negara Integralistik (Prof. Dr. Soepomo)",
+                date: "31 Mei 1945",
+                content: `
+                    <p class="text-xs text-slate-300 leading-relaxed mb-3">
+                        Prof. Dr. Soepomo menolak paham individualisme (seperti di Barat) dan paham kelas (seperti paham Marxist). Beliau menawarkan **Paham Negara Integralistik** (Negara Kekeluargaan).
+                    </p>
+                    <div class="bg-slate-900 p-3 rounded-xl border border-slate-700 text-xs text-blue-200 italic mb-3">
+                        "Negara tidak memihak kepada sesuatu golongan... tetapi menjamin kepentingan seluruhnya sebagai satu kesatuan."
+                    </div>
+                    <h4 class="text-xs font-bold text-white uppercase mb-1">Ciri Utama:</h4>
+                    <p class="text-xs text-slate-300">
+                        Negara adalah satu kesatuan organik dengan rakyatnya, mengutamakan musyawarah dan keseimbangan lahir-batin.
+                    </p>
+                `
+            },
+            soekarno: {
+                title: "Pidato Lahirnya Pancasila (Ir. Soekarno)",
+                date: "1 Juni 1945",
+                content: `
+                    <p class="text-xs text-slate-300 leading-relaxed mb-3">
+                        Ir. Soekarno menyampaikan pidatonya yang monumental tanpa teks. Beliau secara tegas memberi nama bagi lima prinsip dasar negara tersebut: **Pancasila**.
+                    </p>
+                    <div class="bg-slate-900 p-3 rounded-xl border border-slate-700 text-xs text-rose-200 italic mb-3">
+                        "Sila artinya asas atau dasar, dan di atas kelima dasar itulah kita mendirikan negara Indonesia, kekal dan abadi."
+                    </div>
+                    <h4 class="text-xs font-bold text-white uppercase mb-1">Keunikan:</h4>
+                    <p class="text-xs text-slate-300">
+                        Soekarno juga memaparkan konsep pembagian **Trisila** dan **Ekasila (Gotong Royong)** untuk mempermudah pemahaman hakikat persatuan.
+                    </p>
+                `
+            }
+        };
+
+        function openModal(tokohKey) {
+            playTone(450, 'sine', 0.08);
+            const data = modalData[tokohKey];
+            const contentBox = document.getElementById('modalContent');
+            contentBox.innerHTML = `
+                <div class="flex items-center justify-between border-b border-slate-700 pb-3 mb-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-white">${data.title}</h3>
+                        <span class="text-xs text-indigo-400 font-semibold">${data.date}</span>
+                    </div>
+                </div>
+                ${data.content}
+            `;
+            document.getElementById('detailModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').classList.add('hidden');
+        }
+
+        /* INITIALIZATION ON WINDOW LOAD */
+        window.onload = function() {
+            updateTimerDisplay();
+            initMatchingGame();
+            updateSilaSimulation(1);
+        };
+    </script>
+</body>
+</html>
